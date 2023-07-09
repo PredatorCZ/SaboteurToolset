@@ -1,0 +1,6 @@
+[submodule "PreCore"]
+	path = 3rd_party/precore
+	url = git@github.com:PredatorCZ/PreCore.git
+[submodule "3rd_party/zlib"]
+	path = 3rd_party/zlib
+	url = git@github.com:madler/zlib.git
