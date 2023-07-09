@@ -24,6 +24,7 @@
 #include "megapack.hpp"
 #include "meshpack.hpp"
 #include "project.h"
+#include <algorithm>
 #include <cassert>
 #include <set>
 
@@ -266,7 +267,7 @@ std::map<uint32, Cinematic> LoadCinpack(BinReaderRef_e rd, size_t endOffset) {
     rd.Read(offset);
     rd.Read(unk);
 
-    items.emplace(id, offset);
+    items.emplace(id, Cinematic{offset});
     offsets.emplace_back(offset);
   }
 

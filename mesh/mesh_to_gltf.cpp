@@ -149,7 +149,7 @@ struct MESHSkeleton {
 
     rd.ReadContainer(boneIds, numBones2);
 
-    for (uint i = 0; i < numUnkBones0; i++) {
+    for (uint32 i = 0; i < numUnkBones0; i++) {
       ReadNull8(rd);
     }
 
@@ -159,7 +159,7 @@ struct MESHSkeleton {
     rd.ReadContainer(transforms, numBones2);
     rd.ReadContainer(parentIds, numBones2);
 
-    for (uint i = 0; i < numBones2; i++) {
+    for (uint32 i = 0; i < numBones2; i++) {
       ReadNull32(rd);
     }
 

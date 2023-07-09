@@ -70,7 +70,7 @@ inline std::map<uint32, FileRange> LoadMegaPack(BinReaderRef_e rd) {
   std::map<uint32, FileRange> retVal;
 
   for (auto &f : files) {
-    retVal.emplace(f.id.index, FileRange(false, f.offset));
+    retVal.emplace(f.id.index, FileRange{false, uint32(f.offset)});
   }
 
   return retVal;

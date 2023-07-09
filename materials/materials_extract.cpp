@@ -264,6 +264,7 @@ struct WSMAItem {
 };
 
 struct Material : WSMAItem {
+  Material(WSMAItem &item) : WSMAItem(item) {}
   StringHash renderPass;
   uint32 flags;
   std::vector<WSSTItem> st0;

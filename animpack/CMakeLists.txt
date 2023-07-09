@@ -12,6 +12,7 @@ build_target(
   LINKS
   precore
   common_obj
+  zlib_obj
   INCLUDES
   ${TPD_PATH}/precore/3rd_party/json
   AUTHOR
