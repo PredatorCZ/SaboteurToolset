@@ -44,7 +44,7 @@ static AppInfo_s appInfo{
 AppInfo_s *AppInitModule() { return &appInfo; }
 
 bool AppInitContext(const std::string &dataFolder) {
-  hash::LoadStorage(dataFolder + "names.txt");
+  hash::LoadStorage(dataFolder + "saboteur_strings.txt");
   return true;
 }
 
@@ -297,13 +297,15 @@ struct Primitive {
 struct Drawcall {
   uint32 primitiveIndex;
   StringHash material;
-  uint32 unk1;
+  uint16 parentBone;
+  uint16 unk;
 
   void Read(BinReaderRef_e rd) {
     rd.Read(primitiveIndex);
     material = ReadStringHash(rd);
     ReadNull32(rd);
-    rd.Read(unk1);
+    rd.Read(parentBone);
+    rd.Read(unk);
   }
 };
 
@@ -670,13 +672,16 @@ void ProcessMesh(BinReaderRef_e rd, AppContext *ctx, MESH &hdr, GLTFModel &main,
     ProcessStream(s, strRd, main);
   }
 
-  gltf::Mesh &mesh = main.meshes.emplace_back();
+  std::vector<gltf::Primitive> glPrims;
 
   for (auto &p : primitives) {
     Stream &str = streams.at(p.streamIndex);
-    gltf::Primitive &prim = mesh.primitives.emplace_back();
-    prim.attributes = str.attributes;
-    prim.indices = main.accessors.size();
+    {
+      gltf::Primitive prim;
+      prim.attributes = str.attributes;
+      prim.indices = main.accessors.size();
+      glPrims.emplace_back(std::move(prim));
+    }
 
     gltf::Accessor &acc = main.accessors.emplace_back();
     acc.bufferView = main.GetIndexStream().slot;
@@ -684,6 +689,43 @@ void ProcessMesh(BinReaderRef_e rd, AppContext *ctx, MESH &hdr, GLTFModel &main,
     acc.componentType = gltf::Accessor::ComponentType::UnsignedShort;
     acc.count = p.numIndices;
     acc.type = gltf::Accessor::Type::Scalar;
+  }
+
+  std::map<uint32, std::vector<Drawcall>> sortedDrawCalls;
+  std::map<StringHash, uint32> materials;
+
+  for (auto &d : drawCalls) {
+    sortedDrawCalls[d.parentBone].emplace_back(d);
+    if (!materials.contains(d.material)) {
+      materials.emplace(d.material, main.materials.size());
+      gltf::Material &mat = main.materials.emplace_back();
+      mat.name = "m" + std::to_string(d.material);
+    }
+  }
+
+  for (auto &[boneId, drawCall] : sortedDrawCalls) {
+    if (!skeleton.boneIds.empty()) {
+      main.nodes.at(boneId).children.emplace_back(main.nodes.size());
+    } else {
+      main.scenes.front().nodes.emplace_back(main.nodes.size());
+    }
+
+    auto &node = main.nodes.emplace_back();
+    node.mesh = main.meshes.size();
+
+    if (!skeleton.boneIds.empty()) {
+      if (!boneRemaps.empty()) {
+        node.skin = 0;
+      }
+    }
+
+    gltf::Mesh &mesh = main.meshes.emplace_back();
+
+    for (auto &call : drawCall) {
+      auto prim = glPrims.at(call.primitiveIndex);
+      prim.material = materials.at(call.material);
+      mesh.primitives.emplace_back(std::move(prim));
+    }
   }
 
   if (!skeleton.boneIds.empty()) {
@@ -703,17 +745,6 @@ void ProcessMesh(BinReaderRef_e rd, AppContext *ctx, MESH &hdr, GLTFModel &main,
         ibmStream.wr.Write(skeleton.ibms.at(boneId));
         // ibmStream.wr.Write(b.ibm); unreliable
       }
-    }
-  }
-
-  main.scenes.front().nodes.emplace_back(main.nodes.size());
-
-  auto &node = main.nodes.emplace_back();
-  node.mesh = 0;
-
-  if (!skeleton.boneIds.empty()) {
-    if (!boneRemaps.empty()) {
-      node.skin = 0;
     }
   }
 
