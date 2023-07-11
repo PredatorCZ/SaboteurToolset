@@ -40,7 +40,7 @@ static AppInfo_s appInfo{
 AppInfo_s *AppInitModule() { return &appInfo; }
 
 bool AppInitContext(const std::string &dataFolder) {
-  hash::LoadStorage(dataFolder + "names.txt");
+  hash::LoadStorage(dataFolder + "saboteur_strings.txt");
   return true;
 }
 

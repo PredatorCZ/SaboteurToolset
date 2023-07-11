@@ -49,4 +49,4 @@ add_spike_subdir(luapack)
 add_subdirectory(hash)
 add_spike_subdir(materials)
 
-install(FILES "names.txt" DESTINATION $<IF:$<BOOL:${UNIX}>,.,bin>)
+install(FILES "saboteur_strings.txt" DESTINATION $<IF:$<BOOL:${UNIX}>,data,bin/data>)

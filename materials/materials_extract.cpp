@@ -38,7 +38,7 @@ static AppInfo_s appInfo{
 AppInfo_s *AppInitModule() { return &appInfo; }
 
 bool AppInitContext(const std::string &dataFolder) {
-  hash::LoadStorage(dataFolder + "names.txt");
+  hash::LoadStorage(dataFolder + "saboteur_strings.txt");
   return true;
 }
 
@@ -415,7 +415,7 @@ void AppProcessFile(AppContext *ctx) {
     std::string path;
     path.push_back(uid.front());
     path.push_back('/');
-    path.append(uid);
+    path += uid + ".json";
 
     ectx->NewFile(path);
     ectx->SendData(std::move(stream).str());
