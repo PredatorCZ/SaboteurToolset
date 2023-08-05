@@ -15,19 +15,19 @@
     along with this program.If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "datas/app_context.hpp"
-#include "datas/binreader_stream.hpp"
-#include "datas/except.hpp"
-#include "datas/reflector.hpp"
 #include "hashstorage.hpp"
 #include "meshpack.hpp"
 #include "project.h"
+#include "spike/app_context.hpp"
+#include "spike/except.hpp"
+#include "spike/io/binreader_stream.hpp"
+#include "spike/reflect/reflector.hpp"
 #include <cassert>
 
 static AppInfo_s appInfo{
     .filteredLoad = true,
-    .header =
-        TilePack_DESC " v" TilePack_VERSION ", " TilePack_COPYRIGHT "Lukas Cone",
+    .header = TilePack_DESC " v" TilePack_VERSION ", " TilePack_COPYRIGHT
+                            "Lukas Cone",
 };
 
 AppInfo_s *AppInitModule() { return &appInfo; }
@@ -245,17 +245,16 @@ void AppProcessFile(AppContext *ctx) {
     const char *dtex = rd.SwappedEndian() ? "XETD" : "DTEX";
 
     for (auto &df : textures) {
-        if (!df.size) {
-          continue;
-        }
-
-        rd.ReadContainer(inBuffer, df.size);
-
-        ectx->NewFile(std::to_string(hash::GetStringHash(df.hash0)) +
-                      ".dtex");
-        ectx->SendData(dtex);
-        ectx->SendData(inBuffer);
+      if (!df.size) {
+        continue;
       }
+
+      rd.ReadContainer(inBuffer, df.size);
+
+      ectx->NewFile(std::to_string(hash::GetStringHash(df.hash0)) + ".dtex");
+      ectx->SendData(dtex);
+      ectx->SendData(inBuffer);
+    }
 
     return;
   }

@@ -17,7 +17,7 @@
 
 #pragma once
 #include "compressed.hpp"
-#include "datas/except.hpp"
+#include "spike/except.hpp"
 
 static constexpr uint32 MSHA_ID = CompileFourCC("AHSM");
 

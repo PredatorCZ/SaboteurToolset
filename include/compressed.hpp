@@ -16,8 +16,8 @@
 */
 
 #pragma once
-#include "datas/app_context.hpp"
-#include "datas/binreader_stream.hpp"
+#include "spike/app_context.hpp"
+#include "spike/io/binreader_stream.hpp"
 #include "zlib.h"
 
 void ExtractZlib(AppExtractContext *ectx, uint32 compSize, uint32 uncompSize,

@@ -10,7 +10,7 @@ build_target(
   SOURCES
   megapack_extract.cpp
   LINKS
-  precore
+  spike
   common_obj
   AUTHOR
   "Lukas Cone"

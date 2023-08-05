@@ -10,10 +10,10 @@ build_target(
   SOURCES
   materials_extract.cpp
   LINKS
-  precore
+  spike
   common_obj
   INCLUDES
-  ${TPD_PATH}/precore/3rd_party/json
+  ${TPD_PATH}/spike/3rd_party/json
   AUTHOR
   "Lukas Cone"
   DESCR

@@ -10,7 +10,7 @@ build_target(
   SOURCES
   tilepack_extract.cpp
   LINKS
-  precore
+  spike
   zlib_obj
   common_obj
   AUTHOR

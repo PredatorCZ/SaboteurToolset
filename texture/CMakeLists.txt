@@ -10,7 +10,7 @@ build_target(
   SOURCES
   dtex_to_dds.cpp
   LINKS
-  precore
+  spike
   zlib_obj
   AUTHOR
   "Lukas Cone"

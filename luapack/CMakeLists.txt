@@ -10,7 +10,7 @@ build_target(
   SOURCES
   luap_extract.cpp
   LINKS
-  precore
+  spike
   AUTHOR
   "Lukas Cone"
   DESCR

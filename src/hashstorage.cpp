@@ -16,9 +16,9 @@
 */
 
 #include "hashstorage.hpp"
-#include "datas/app_context.hpp"
-#include "datas/master_printer.hpp"
-#include "datas/stat.hpp"
+#include "spike/app_context.hpp"
+#include "spike/io/stat.hpp"
+#include "spike/master_printer.hpp"
 #include <cassert>
 #include <map>
 #include <memory>

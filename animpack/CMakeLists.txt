@@ -10,11 +10,11 @@ build_target(
   SOURCES
   anim_extract.cpp
   LINKS
-  precore
+  spike
   common_obj
   zlib_obj
   INCLUDES
-  ${TPD_PATH}/precore/3rd_party/json
+  ${TPD_PATH}/spike/3rd_party/json
   AUTHOR
   "Lukas Cone"
   DESCR

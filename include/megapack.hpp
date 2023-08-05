@@ -16,6 +16,9 @@
 */
 
 #include "hashstorage.hpp"
+#include "spike/except.hpp"
+#include <map>
+#include <vector>
 
 static constexpr uint32 MP_ID = CompileFourCC("00PM");
 static constexpr uint32 MP_ID_BE = CompileFourCC("MP00");

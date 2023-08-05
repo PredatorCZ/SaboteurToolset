@@ -5,26 +5,19 @@ project(SaboteurToolset)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wl,--no-undefined")
 
-set(BUILD_SHARED_LIBS
-    ON
-    CACHE BOOL "")
-set(BUILD_STATIC_OBJECTS
-    OFF
-    CACHE BOOL "")
-set(NO_OBJECTS
-    ON
-    CACHE BOOL "" FORCE)
+option(BUILD_SHARED_LIBS "" ON)
+option(NO_OBJECTS "" ON)
+option(CLI "" ON)
+option(GLTF "" ON)
 
 set(TPD_PATH ${CMAKE_CURRENT_SOURCE_DIR}/3rd_party)
 
-add_subdirectory(${TPD_PATH}/precore)
+add_subdirectory(${TPD_PATH}/spike)
 include(targetex)
 include(version)
 toolset_version()
 
-add_subdirectory(${TPD_PATH}/precore/spike ${CMAKE_CURRENT_BINARY_DIR}/spike)
-add_subdirectory(${TPD_PATH}/precore/gltf)
-set_target_properties(spike PROPERTIES OUTPUT_NAME saboteur_toolset)
+set_target_properties(spike_cli PROPERTIES OUTPUT_NAME saboteur_toolset)
 
 file(GLOB ZLIB_SOURCE_FILES "${TPD_PATH}/zlib/*.c")
 
@@ -35,7 +28,7 @@ set_target_properties(zlib_obj PROPERTIES POSITION_INDEPENDENT_CODE ON)
 add_library(common_obj OBJECT src/hashstorage.cpp)
 target_include_directories(common_obj PUBLIC include)
 set_target_properties(common_obj PROPERTIES POSITION_INDEPENDENT_CODE ON)
-target_link_libraries(common_obj precore)
+target_link_libraries(common_obj spike)
 
 add_spike_subdir(megapack)
 add_spike_subdir(tilepack)

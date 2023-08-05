@@ -10,7 +10,7 @@ build_target(
   SOURCES
   mesh_to_gltf.cpp
   LINKS
-  precore
+  spike
   common_obj
   gltf
   AUTHOR
