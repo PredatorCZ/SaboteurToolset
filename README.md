@@ -19,7 +19,18 @@ All other tools are independent on each other.
 
 This toolset runs on Spike foundation.
 
-Head to this **[Wiki](https://github.com/PredatorCZ/PreCore/wiki/Spike)** for more information on how to effectively use it.
+Head to this **[Wiki](https://github.com/PredatorCZ/Spike/wiki/Spike)** for more information on how to effectively use it.
+
+## Release authenticity
+
+Every release asset will contain corresponding `.sig` file, together with [Sign Key](sign_key.asc) can be used to verify asset via gpg.
+
+Simple usage:
+
+```bash
+gpg --import sign_key.asc # Required only once
+gpg --verify <asset_name>.sig
+```
 
 ## AnimationsExtract
 
@@ -96,8 +107,8 @@ Extracts map tiles from packs extracted by `megapack_extract` tool.
 
 ## License
 
-This toolset is available under GPL v3 license. (See LICENSE.md)\
+This toolset is available under GPL v3 license. (See LICENSE)\
 This toolset uses following libraries:
 
-- PreCore, Copyright (c) 2016-2023 Lukas Cone
-- zlib, Copyright (C) 1995-2022 Jean-loup Gailly and Mark Adler
+- Spike, Copyright (c) 2016-2023 Lukas Cone (Apache 2)
+- zlib, Copyright (C) 1995-2022 Jean-loup Gailly and Mark Adler (Zlib)
