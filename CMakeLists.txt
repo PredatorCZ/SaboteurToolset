@@ -3,12 +3,12 @@ cmake_minimum_required(VERSION 3.3)
 set(CMAKE_CXX_STANDARD 20)
 project(SaboteurToolset)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wl,--no-undefined")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wl,--no-allow-shlib-undefined")
 
-option(BUILD_SHARED_LIBS "" ON)
-option(NO_OBJECTS "" ON)
 option(CLI "" ON)
 option(GLTF "" ON)
+
+set(EXPOSE_SYMBOLS spike;gltf)
 
 set(TPD_PATH ${CMAKE_CURRENT_SOURCE_DIR}/3rd_party)
 
@@ -28,7 +28,7 @@ set_target_properties(zlib_obj PROPERTIES POSITION_INDEPENDENT_CODE ON)
 add_library(common_obj OBJECT src/hashstorage.cpp)
 target_include_directories(common_obj PUBLIC include)
 set_target_properties(common_obj PROPERTIES POSITION_INDEPENDENT_CODE ON)
-target_link_libraries(common_obj spike)
+target_link_libraries(common_obj spike-interface)
 
 add_spike_subdir(megapack)
 add_spike_subdir(tilepack)

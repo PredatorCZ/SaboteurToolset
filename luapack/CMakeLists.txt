@@ -10,7 +10,7 @@ build_target(
   SOURCES
   luap_extract.cpp
   LINKS
-  spike
+  spike-interface
   AUTHOR
   "Lukas Cone"
   DESCR

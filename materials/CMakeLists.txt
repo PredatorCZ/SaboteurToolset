@@ -10,7 +10,7 @@ build_target(
   SOURCES
   materials_extract.cpp
   LINKS
-  spike
+  spike-interface
   common_obj
   INCLUDES
   ${TPD_PATH}/spike/3rd_party/json

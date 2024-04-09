@@ -11,6 +11,8 @@ build_target(
   hash_string.cpp
   LINKS
   common_obj
+  spike-objects
+  pugixml-objects
   AUTHOR
   "Lukas Cone"
   DESCR

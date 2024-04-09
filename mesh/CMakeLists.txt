@@ -10,9 +10,9 @@ build_target(
   SOURCES
   mesh_to_gltf.cpp
   LINKS
-  spike
+  spike-interface
   common_obj
-  gltf
+  gltf-interface
   AUTHOR
   "Lukas Cone"
   DESCR

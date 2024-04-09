@@ -10,7 +10,7 @@ build_target(
   SOURCES
   anim_extract.cpp
   LINKS
-  spike
+  spike-interface
   common_obj
   zlib_obj
   INCLUDES

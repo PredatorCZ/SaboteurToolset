@@ -10,7 +10,7 @@ build_target(
   SOURCES
   loosefiles_extract.cpp
   LINKS
-  spike
+  spike-interface
   AUTHOR
   "Lukas Cone"
   DESCR
