@@ -64,6 +64,15 @@ void AppProcessFile(AppContext *ctx) {
   auto ectx = ctx->ExtractContext();
   std::string bufferStr;
 
+  const char *packExt = ".pack";
+
+  if (std::string_view fileName = ctx->workingFile.GetFilename().substr(1);
+      fileName.starts_with("ynamic")) {
+    packExt = ".dynpack";
+  } else if (fileName.starts_with("alettes")) {
+    packExt = ".palettepack";
+  }
+
   for (auto &f : files) {
     rd.Seek(f.offset);
     rd.ReadContainer(bufferStr, f.size);
@@ -76,10 +85,23 @@ void AppProcessFile(AppContext *ctx) {
     const char *ext = ".dat";
 
     if (id == SBLA_ID || id == SBLA_ID_BE) {
-      ext = ".pack";
+      ext = packExt;
     }
 
-    ectx->NewFile(std::to_string(hash::GetStringHash(f.id.index)) + ext);
+    StringHash fileid = hash::GetStringHash(f.id.index);
+
+    auto NewFile = [&](auto &input) {
+      std::string path(std::to_string(input));
+      if constexpr (std::is_same_v<uint32 &, decltype(input)>) {
+        if (path.size() > 2) {
+          path = path.substr(0, 2) + "/" + path;
+        }
+      }
+      ectx->NewFile(path + ext);
+    };
+
+    std::visit(NewFile, fileid);
+
     ectx->SendData(bufferStr);
   }
 }

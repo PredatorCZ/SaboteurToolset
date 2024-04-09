@@ -154,7 +154,8 @@ struct Mask {
 };
 
 struct Meta {
-  uint32 null0[3];
+  uint32 null0[2];
+  uint32 dataOffset;
   uint32 numMeshes;
   uint32 numTextures;
   uint32 null1[6];
@@ -217,7 +218,6 @@ void AppProcessFile(AppContext *ctx) {
 
     assert(meta.null0[0] == 0);
     assert(meta.null0[1] == 0);
-    assert(meta.null0[2] == 0);
     assert(meta.null1[0] == 0);
     assert(meta.null1[1] == 0);
     assert(meta.null1[2] == 0);
