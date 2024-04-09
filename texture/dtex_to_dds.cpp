@@ -45,7 +45,7 @@ struct Texture {
   uint32 unk;
   uint16 width;
   uint16 height;
-  uint16 numMips; //??
+  uint16 numMips;
   uint32 uncompressedSize;
   uint32 numStreams;
 
@@ -58,6 +58,15 @@ struct Texture {
     rd.Read(uncompressedSize);
     rd.Read(numStreams);
   }
+};
+
+struct InnerTexture {
+  uint32 mipIndex;
+  uint32 width;
+  uint32 height;
+  uint32 null1; // depth?
+  uint32 const0;
+  uint32 mipSize;
 };
 
 void AppProcessFile(AppContext *ctx) {
@@ -83,37 +92,10 @@ void AppProcessFile(AppContext *ctx) {
   Texture tex;
   rd.Read(tex);
 
-  DDS ddtex = {};
-  ddtex = DDSFormat_DX10;
-  ddtex.width = tex.width;
-  ddtex.height = tex.height;
-
-  switch (tex.format) {
-  case CompileFourCC("DXT1"):
-    ddtex.dxgiFormat = DXGI_FORMAT_BC1_UNORM;
-    break;
-  case CompileFourCC("DXT5"):
-    ddtex.dxgiFormat = DXGI_FORMAT_BC3_UNORM;
-    break;
-  case 21:
-    ddtex.dxgiFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
-    break;
-
-  default:
-    throw std::runtime_error("Unknown format: " + std::to_string(tex.format));
-    break;
-  }
-
-  ddtex.NumMipmaps(tex.numMips);
-
-  const uint32 sizetoWrite =
-      ddtex.ToLegacy() ? ddtex.DDS_SIZE : ddtex.LEGACY_SIZE;
-  BinWritterRef wr(ctx->NewFile(name + ".dds").str);
-
-  wr.WriteBuffer(reinterpret_cast<const char *>(&ddtex), sizetoWrite);
   std::string inBuffer;
   std::string outBuffer;
   outBuffer.resize(tex.uncompressedSize);
+  uint32 processedBytes = 0;
 
   for (size_t i = 0; i < tex.numStreams; i++) {
     rd.ReadContainer(inBuffer);
@@ -124,16 +106,57 @@ void AppProcessFile(AppContext *ctx) {
     infstream.opaque = Z_NULL;
     infstream.avail_in = inBuffer.size();
     infstream.next_in = reinterpret_cast<Bytef *>(&inBuffer[0]);
-    infstream.avail_out = outBuffer.size();
-    infstream.next_out = reinterpret_cast<Bytef *>(&outBuffer[0]);
+    infstream.avail_out = outBuffer.size() - processedBytes;
+    infstream.next_out =
+        reinterpret_cast<Bytef *>(&outBuffer[0]) + processedBytes;
     inflateInit(&infstream);
     int state = inflate(&infstream, Z_FINISH);
     inflateEnd(&infstream);
+    processedBytes += infstream.total_out;
 
     if (state < 0) {
       throw std::runtime_error(infstream.msg);
     }
+  }
 
-    wr.WriteBuffer(outBuffer.data() + 4 * 6, infstream.total_out);
+  NewTexelContext *tctx = ctx->NewImage({
+      .width = tex.width,
+      .height = tex.height,
+      .baseFormat =
+          {
+              .type =
+                  [&] {
+                    switch (tex.format) {
+                    case CompileFourCC("DXT1"):
+                      return TexelInputFormatType::BC1;
+                    case CompileFourCC("DXT5"):
+                      return TexelInputFormatType::BC3;
+                    case 21:
+                      return TexelInputFormatType::RGBA8;
+                    default:
+                      throw std::runtime_error("Unknown format: " +
+                                               std::to_string(tex.format));
+                    }
+
+                    return TexelInputFormatType::INVALID;
+                  }(),
+          },
+      .numMipmaps = uint8(tex.numMips),
+  });
+
+  const char *texData = outBuffer.data();
+  const uint8 numMips = tctx->ShouldDoMipmaps() ? tex.numMips : 1;
+
+  for (uint8 m = 0; m < numMips; m++) {
+    const InnerTexture *datat = reinterpret_cast<const InnerTexture *>(texData);
+    texData += sizeof(InnerTexture);
+    tctx->SendRasterData(texData, TexelInputLayout{
+                                      .mipMap = m,
+                                  });
+
+    texData += datat->mipSize;
+
+    // assert(datat->const0 == 1);
+    // assert(datat->null1 == 0);
   }
 }
