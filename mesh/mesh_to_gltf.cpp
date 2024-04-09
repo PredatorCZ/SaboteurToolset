@@ -380,52 +380,26 @@ struct Proxy : uni::PrimitiveDescriptor {
   UnpackDataType_e UnpackDataType() const { return UnpackDataType_e::None; };
 };
 
-struct IndexProxy : uni::IndexArray {
-  std::vector<uint16> indices;
-  const char *RawIndexBuffer() const override {
-    return reinterpret_cast<const char *>(indices.data());
-  }
-  size_t IndexSize() const override { return 2; }
-  size_t NumIndices() const override { return indices.size(); }
-};
-
-static const Proxy Vertex_Position(uni::FormatType::FLOAT,
-                                   uni::DataType::R16G16B16A16,
-                                   Proxy::Usage_e::Position);
-
-static const Proxy Vertex_BoneWeights(uni::FormatType::UNORM,
-                                      uni::DataType::R8G8B8A8,
-                                      Proxy::Usage_e::BoneWeights);
-static const Proxy Vertex_BoneIndices(uni::FormatType::UINT,
-                                      uni::DataType::R8G8B8A8,
-                                      Proxy::Usage_e::BoneIndices);
-static const Proxy Vertex_UV(uni::FormatType::FLOAT, uni::DataType::R16G16,
-                             Proxy::Usage_e::TextureCoordiante);
-static const Proxy Vertex_Normal(uni::FormatType::FLOAT,
-                                 uni::DataType::R32G32B32,
-                                 Proxy::Usage_e::Normal);
-static const Proxy Vertex_Tangent(uni::FormatType::UNORM,
-                                  uni::DataType::R8G8B8A8,
-                                  Proxy::Usage_e::Tangent);
-static const Proxy Vertex_Color(uni::FormatType::UNORM, uni::DataType::R8G8B8A8,
-                                Proxy::Usage_e::VertexColor);
-
-template <std::same_as<Proxy>... T>
-std::vector<Proxy> BuildVertices(T... items) {
-  size_t offset = 0;
-  static constexpr size_t fmtStrides[]{0,  128, 96, 64, 64, 48, 32, 32, 32,
-                                       32, 32,  32, 24, 16, 16, 16, 16, 8};
-  uint8 indices[0x10]{};
-
-  auto NewDesc = [&](Proxy item) {
-    item.offset = offset;
-    item.index = indices[uint8(item.usage)]++;
-    offset += fmtStrides[uint8(item.type.compType)] / 8;
-    return item;
-  };
-
-  return std::vector<Proxy>{NewDesc(items)...};
-}
+static const Attribute Vertex_Position(uni::DataType::R16G16B16A16,
+                                       uni::FormatType::FLOAT,
+                                       AttributeType::Position);
+static const Attribute Vertex_BoneWeights(uni::DataType::R8G8B8A8,
+                                          uni::FormatType::UNORM,
+                                          AttributeType::BoneWeights);
+static const Attribute Vertex_BoneIndices(uni::DataType::R8G8B8A8,
+                                          uni::FormatType::UINT,
+                                          AttributeType::BoneIndices);
+static const Attribute Vertex_UV(uni::DataType::R16G16, uni::FormatType::FLOAT,
+                                 AttributeType::TextureCoordiante);
+static const Attribute Vertex_Normal(uni::DataType::R32G32B32,
+                                     uni::FormatType::FLOAT,
+                                     AttributeType::Normal);
+static const Attribute Vertex_Tangent(uni::DataType::R8G8B8A8,
+                                      uni::FormatType::UNORM,
+                                      AttributeType::Tangent);
+static const Attribute Vertex_Color(uni::DataType::R8G8B8A8,
+                                    uni::FormatType::UNORM,
+                                    AttributeType::VertexColor);
 
 enum VertexFormat_e {
   PositionType_HalfFloat = 2,
@@ -446,106 +420,101 @@ struct VertexFormat {
   void Swap();
 };
 
-static const std::map<uint32, std::vector<Proxy>> proxies{
+static const std::map<uint32, std::vector<Attribute>> proxies{
     {
         0x1b001102,
-        BuildVertices(Vertex_Position, Vertex_UV, Vertex_Normal),
+        {Vertex_Position, Vertex_UV, Vertex_Normal},
     },
     {
         0x1b001112,
-        BuildVertices(Vertex_Position, Vertex_Color, Vertex_UV, Vertex_Normal),
+        {Vertex_Position, Vertex_Color, Vertex_UV, Vertex_Normal},
     },
     {
         0x1b001202,
-        BuildVertices(Vertex_Position, Vertex_UV, Vertex_UV, Vertex_Normal),
+        {Vertex_Position, Vertex_UV, Vertex_UV, Vertex_Normal},
     },
     {
         0x1b001302,
-        BuildVertices(Vertex_Position, Vertex_UV, Vertex_UV, Vertex_UV,
-                      Vertex_Normal),
+        {Vertex_Position, Vertex_UV, Vertex_UV, Vertex_UV, Vertex_Normal},
     },
     {
         0x1b001402,
-        BuildVertices(Vertex_Position, Vertex_UV, Vertex_UV, Vertex_UV,
-                      Vertex_UV, Vertex_Normal),
+        {Vertex_Position, Vertex_UV, Vertex_UV, Vertex_UV, Vertex_UV,
+         Vertex_Normal},
     },
     {
         0x1b003102,
-        BuildVertices(Vertex_Position, Vertex_UV, Vertex_Normal,
-                      Vertex_Tangent),
+        {Vertex_Position, Vertex_UV, Vertex_Normal, Vertex_Tangent},
     },
     {
         0x1b003112,
-        BuildVertices(Vertex_Position, Vertex_Color, Vertex_UV, Vertex_Normal,
-                      Vertex_Tangent),
+        {Vertex_Position, Vertex_Color, Vertex_UV, Vertex_Normal,
+         Vertex_Tangent},
     },
     {
         0x1b003202,
-        BuildVertices(Vertex_Position, Vertex_UV, Vertex_UV, Vertex_Normal,
-                      Vertex_Tangent),
+        {Vertex_Position, Vertex_UV, Vertex_UV, Vertex_Normal, Vertex_Tangent},
     },
     {
         0x1b003302,
-        BuildVertices(Vertex_Position, Vertex_UV, Vertex_UV, Vertex_UV,
-                      Vertex_Normal, Vertex_Tangent),
+        {Vertex_Position, Vertex_UV, Vertex_UV, Vertex_UV, Vertex_Normal,
+         Vertex_Tangent},
     },
     {
         0x1b003402,
-        BuildVertices(Vertex_Position, Vertex_UV, Vertex_UV, Vertex_UV,
-                      Vertex_UV, Vertex_Normal, Vertex_Tangent),
+        {Vertex_Position, Vertex_UV, Vertex_UV, Vertex_UV, Vertex_UV,
+         Vertex_Normal, Vertex_Tangent},
     },
 
     {
         0x1b001106,
-        BuildVertices(Vertex_Position, Vertex_BoneWeights, Vertex_BoneIndices,
-                      Vertex_UV, Vertex_Normal),
+        {Vertex_Position, Vertex_BoneWeights, Vertex_BoneIndices, Vertex_UV,
+         Vertex_Normal},
     },
     {
         0x1b001206,
-        BuildVertices(Vertex_Position, Vertex_BoneWeights, Vertex_BoneIndices,
-                      Vertex_UV, Vertex_UV, Vertex_Normal),
+        {Vertex_Position, Vertex_BoneWeights, Vertex_BoneIndices, Vertex_UV,
+         Vertex_UV, Vertex_Normal},
     },
     {
         0x1b001306,
-        BuildVertices(Vertex_Position, Vertex_BoneWeights, Vertex_BoneIndices,
-                      Vertex_UV, Vertex_UV, Vertex_UV, Vertex_Normal),
+        {Vertex_Position, Vertex_BoneWeights, Vertex_BoneIndices, Vertex_UV,
+         Vertex_UV, Vertex_UV, Vertex_Normal},
     },
     {
         0x1b001116,
-        BuildVertices(Vertex_Position, Vertex_BoneWeights, Vertex_BoneIndices,
-                      Vertex_Color, Vertex_UV, Vertex_Normal),
+        {Vertex_Position, Vertex_BoneWeights, Vertex_BoneIndices, Vertex_Color,
+         Vertex_UV, Vertex_Normal},
     },
     {
         0x1b003106,
-        BuildVertices(Vertex_Position, Vertex_BoneWeights, Vertex_BoneIndices,
-                      Vertex_UV, Vertex_Normal, Vertex_Tangent),
+        {Vertex_Position, Vertex_BoneWeights, Vertex_BoneIndices, Vertex_UV,
+         Vertex_Normal, Vertex_Tangent},
     },
     {
         0x1b003206,
-        BuildVertices(Vertex_Position, Vertex_BoneWeights, Vertex_BoneIndices,
-                      Vertex_UV, Vertex_UV, Vertex_Normal, Vertex_Tangent),
+        {Vertex_Position, Vertex_BoneWeights, Vertex_BoneIndices, Vertex_UV,
+         Vertex_UV, Vertex_Normal, Vertex_Tangent},
     },
     {
         0x1b003306,
-        BuildVertices(Vertex_Position, Vertex_BoneWeights, Vertex_BoneIndices,
-                      Vertex_UV, Vertex_UV, Vertex_UV, Vertex_Normal,
-                      Vertex_Tangent),
+        {Vertex_Position, Vertex_BoneWeights, Vertex_BoneIndices, Vertex_UV,
+         Vertex_UV, Vertex_UV, Vertex_Normal, Vertex_Tangent},
     },
     {
         0x1b003116,
-        BuildVertices(Vertex_Position, Vertex_BoneWeights, Vertex_BoneIndices,
-                      Vertex_Color, Vertex_UV, Vertex_Normal, Vertex_Tangent),
+        {Vertex_Position, Vertex_BoneWeights, Vertex_BoneIndices, Vertex_Color,
+         Vertex_UV, Vertex_Normal, Vertex_Tangent},
     },
-
 };
 
 void ProcessStream(Stream &str, BinReaderRef_e rd, GLTFModel &main) {
   rd.Seek(str.indexBufferOffset);
-  IndexProxy indices;
-  rd.ReadContainer(indices.indices, str.numIndices);
+  std::vector<uint16> indices;
+  rd.ReadContainer(indices, str.numIndices);
   auto &stream = main.GetIndexStream();
   str.indexBegin = stream.wr.Tell();
-  stream.wr.WriteContainer(indices.indices);
+  stream.wr.WriteContainer(indices);
 
   rd.Seek(str.vertexBufferOffset);
   std::string buffer;
@@ -559,91 +528,7 @@ void ProcessStream(Stream &str, BinReaderRef_e rd, GLTFModel &main) {
   }
 
   auto formats = format->second;
-  std::vector<UCVector4> joints;
-  std::vector<UCVector4> weights;
-
-  for (auto &f : formats) {
-    f.buffer = buffer.data() + f.offset;
-    f.stride = str.vertexBufferStride;
-
-    switch (f.usage) {
-    case Proxy::Usage_e::Position:
-      main.WritePositions(str.attributes, f, str.numVertices);
-      break;
-
-    case Proxy::Usage_e::Normal:
-      str.attributes["NORMAL"] = main.WriteNormals16(f, str.numVertices);
-      break;
-
-    case Proxy::Usage_e::TextureCoordiante:
-      main.WriteTexCoord(str.attributes, f, str.numVertices);
-      break;
-    case Proxy::Usage_e::VertexColor:
-      main.WriteVertexColor(str.attributes, f, str.numVertices);
-      break;
-
-    case Proxy::Usage_e::BoneWeights: {
-      uni::FormatCodec::fvec sampled;
-      f.Codec().Sample(sampled, f.RawBuffer(), str.numVertices, f.Stride());
-      f.Resample(sampled);
-
-      for (auto &v : sampled) {
-        auto pure = v;
-        pure *= 0xff;
-        pure = Vector4A16(_mm_round_ps(pure._data, _MM_ROUND_NEAREST));
-        auto comp = pure.Convert<uint8>();
-        weights.emplace_back(comp);
-      }
-
-      break;
-    }
-
-    case Proxy::Usage_e::BoneIndices: {
-      uni::FormatCodec::ivec sampled;
-      f.Codec().Sample(sampled, f.RawBuffer(), str.numVertices, f.Stride());
-
-      for (auto &v : sampled) {
-        joints.emplace_back(v.Convert<uint8>());
-      }
-
-      break;
-    }
-
-    default:
-      break;
-    }
-  }
-
-  if (!joints.empty()) {
-    for (size_t v = 0; v < str.numVertices; v++) {
-      for (size_t e = 0; e < 4; e++) {
-        if (weights.at(v)[e] == 0) {
-          joints.at(v)[e] = 0;
-        }
-      }
-    }
-
-    {
-      auto &stream = main.GetVt4();
-      auto [acc, index] = main.NewAccessor(stream, 4);
-      acc.count = str.numVertices;
-      acc.componentType = gltf::Accessor::ComponentType::UnsignedByte;
-      acc.normalized = true;
-      acc.type = gltf::Accessor::Type::Vec4;
-      stream.wr.WriteContainer(weights);
-      str.attributes["WEIGHTS_0"] = index;
-    }
-
-    {
-      auto &stream = main.GetVt4();
-      auto [acc, index] = main.NewAccessor(stream, 4);
-      acc.count = str.numVertices;
-      acc.componentType = gltf::Accessor::ComponentType::UnsignedByte;
-      acc.type = gltf::Accessor::Type::Vec4;
-      stream.wr.WriteContainer(joints);
-      str.attributes["JOINTS_0"] = index;
-    }
-  }
+  main.SaveVertices(buffer.data(), str.numVertices, formats, str.vertexBufferStride);
 }
 
 void ProcessMesh(BinReaderRef_e rd, AppContext *ctx, MESH &hdr, GLTFModel &main,
