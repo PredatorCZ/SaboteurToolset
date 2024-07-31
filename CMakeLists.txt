@@ -44,3 +44,5 @@ add_spike_subdir(materials)
 add_spike_subdir(shaders)
 
 install(FILES "saboteur_strings.txt" DESTINATION $<IF:$<BOOL:${UNIX}>,data,bin/data>)
+
+add_subdirectory(launcher)
